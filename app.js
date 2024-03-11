@@ -3,6 +3,7 @@ const cors = require('cors');
 const path = require('path');
 const bodyParser = require('body-parser');
 const session = require("express-session");
+const bcrypt = require("bcrypt");
 
 const db = require('./utils/db');
 const User = require('./modals/user');
@@ -38,10 +39,12 @@ app.post('/users/signup', async (req, res) => {
       return res.status(400).json({ error: 'User already registered. Please login.' });
     }
 
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const newUser = await User.create({
       name: name,
       email: email,
-      password: password, // Remember to hash the password before storing it
+      password: hashedPassword, // Remember to hash the password before storing it
     });
 
     res.json({ success: true, message: 'Signup successful!', user: newUser });
@@ -60,13 +63,20 @@ app.post('/users/login', async (req, res) => {
       const user = await User.findOne({
         where: {
           email: email,
-          password: password, // You should hash the password and compare it securely
+          // You should hash the password and compare it securely
         },
       });
   
       if (!user) {
         console.log('Invalid email or password.');
         return res.status(400).json({ error: 'Invalid email or password.' });
+      }
+
+      const passwordMatch = await bcrypt.compare(password, user.password);
+
+      if (!passwordMatch) {
+          console.log('Invalid email or password.');
+          return res.status(400).json({ error: 'Invalid email or password.' });
       }
   
       console.log('User logged in successfully.');
@@ -92,7 +102,7 @@ db.sync()
   .then(() => {
     console.log('Sequelize sync successful');
     app.listen(3001, () => {
-      console.log('Server is running on port 3000');
+      console.log('Server is running on port 3001');
     });
   })
   .catch((error) => console.error('Error syncing database:', error));
