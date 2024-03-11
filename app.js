@@ -7,7 +7,7 @@ const bcrypt = require("bcrypt");
 
 const db = require('./utils/db');
 const User = require('./modals/user');
-
+const expenseroutes = require('./Router/expenseroutes')
 const app = express();
 
 app.use(cors());
@@ -23,6 +23,13 @@ app.use(
 
 
 app.use(express.static(path.join(__dirname, 'views')));
+
+// app.get('/expense', (req, res) => {
+//   // Send the HTML file as a response
+//   res.sendFile(path.join(__dirname, 'views', 'expense.html'));
+// });
+
+
 
 app.post('/users/signup', async (req, res) => {
   try {
@@ -81,6 +88,7 @@ app.post('/users/login', async (req, res) => {
   
       console.log('User logged in successfully.');
       res.json({ success: true, message: 'Login successful!', user: user });
+      
     } catch (error) {
       console.error('Error during login:', error);
       res.status(500).json({ error: error.message || 'Internal server error' });
@@ -88,6 +96,7 @@ app.post('/users/login', async (req, res) => {
   });
   
 
+  app.use('/', expenseroutes)
 
   app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'index.html'));
@@ -96,6 +105,8 @@ app.post('/users/login', async (req, res) => {
   app.get('/login', (req, res) => {
       res.sendFile(path.join(__dirname, 'views', 'login.html'));
     });
+
+   
   
 
 db.sync()
