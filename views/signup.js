@@ -18,6 +18,9 @@
           // Handle success response here
         })
         .catch(function(error) {
+          const message = document.getElementById('error-message')
+          console.log(message)
+          message.textContent = 'already signIn please login'
           console.error('Error signing up user:', error);
           // Handle error response here
         });
