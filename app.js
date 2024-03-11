@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const bodyParser = require('body-parser');
+const session = require("express-session");
 
 const db = require('./utils/db');
 const User = require('./modals/user');
@@ -11,11 +12,16 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(
+    session({
+      secret: " ",
+      resave: false,
+      saveUninitialized: true,
+    })
+  );
+
 
 app.use(express.static(path.join(__dirname, 'views')));
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'index.html'));
-});
 
 app.post('/users/signup', async (req, res) => {
   try {
@@ -45,10 +51,47 @@ app.post('/users/signup', async (req, res) => {
   }
 });
 
+//login
+
+app.post('/users/login', async (req, res) => {
+    try {
+      const { email, password } = req.body;
+  
+      const user = await User.findOne({
+        where: {
+          email: email,
+          password: password, // You should hash the password and compare it securely
+        },
+      });
+  
+      if (!user) {
+        console.log('Invalid email or password.');
+        return res.status(400).json({ error: 'Invalid email or password.' });
+      }
+  
+      console.log('User logged in successfully.');
+      res.json({ success: true, message: 'Login successful!', user: user });
+    } catch (error) {
+      console.error('Error during login:', error);
+      res.status(500).json({ error: error.message || 'Internal server error' });
+    }
+  });
+  
+
+
+  app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'index.html'));
+  });
+  
+  app.get('/login', (req, res) => {
+      res.sendFile(path.join(__dirname, 'views', 'login.html'));
+    });
+  
+
 db.sync()
   .then(() => {
     console.log('Sequelize sync successful');
-    app.listen(3000, () => {
+    app.listen(3001, () => {
       console.log('Server is running on port 3000');
     });
   })

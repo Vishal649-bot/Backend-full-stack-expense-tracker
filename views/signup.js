@@ -20,7 +20,7 @@
         .catch(function(error) {
           const message = document.getElementById('error-message')
           console.log(message)
-          message.textContent = 'already signIn please login'
+          message.innerHTML = `Already signed in. Please <a href="/login">login</a>.`;
           console.error('Error signing up user:', error);
           // Handle error response here
         });
