@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const path = require('path');
 const expenseModale = require('../modals/expense')
+const jwt = require("jsonwebtoken");
+const userautherization =  require('../middleware/auth')
 
 router.get('/expense', (req, res) => {
     // Send the HTML file as a response
@@ -9,12 +11,19 @@ router.get('/expense', (req, res) => {
 });
 
 router.post('/expense/addexpense', async (req, res) => {
+    const token = req.header("Authorization");
+    console.log(token);
+    const tokenParts = token.split(" ");
+    const decoded = jwt.verify(tokenParts[1], "secretKey")
+    const userId = decoded.userId;
+    console.log(userId);
     try {
         const { amount, description, category } = req.body;
         console.log(req.body);
         console.log(amount);
         console.log(description);
         console.log(category);
+        
         // Validate if required fields are present
         if (!amount || !description || !category) {
             return res.status(400).json({ error: 'Please provide all required fields.' });
@@ -25,6 +34,7 @@ router.post('/expense/addexpense', async (req, res) => {
             expense: amount,
             description: description,
             category: category,
+            userSignupId: userId
         });
 
         res.json({ success: true, message: 'Expense added successfully!', expense: newExpense });
@@ -34,16 +44,24 @@ router.post('/expense/addexpense', async (req, res) => {
     }
 });
 
-router.get('/expense/api', (req, res) => {
+router.get('/expense/api', userautherization.authenticate, (req, res) => {
     // Send the HTML file as a response
-    expenseModale.findAll()
-    .then(expense =>{
-        console.log(expense);
-        res.json(expense)
+   const userId = req.user.id;
+
+    // Find expenses associated with the user ID
+    expenseModale.findAll({
+        where: {
+            userSignupId: userId
+        }
+    })
+    .then(expenses => {
+        console.log(expenses);
+        res.json(expenses);
     })
     .catch(err => {
         console.log(err);
-    })
+        res.status(500).json({ error: 'Internal server error' });
+    });
 });
 
 router.delete('/expense/api/:id', async(req, res) => {

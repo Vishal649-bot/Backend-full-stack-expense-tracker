@@ -7,19 +7,21 @@ const bcrypt = require("bcrypt");
 
 const db = require('./utils/db');
 const User = require('./modals/user');
+const Expense = require('./modals/expense');
 const expenseroutes = require('./Router/expenseroutes')
+const userrouter = require('./Router/userrouter')
 const app = express();
 
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(
-    session({
-      secret: " ",
-      resave: false,
-      saveUninitialized: true,
-    })
-  );
+// app.use(
+//     session({
+//       secret: " ",
+//       resave: false,
+//       saveUninitialized: true,
+//     })
+//   );
 
 
 app.use(express.static(path.join(__dirname, 'views')));
@@ -31,71 +33,7 @@ app.use(express.static(path.join(__dirname, 'views')));
 
 
 
-app.post('/users/signup', async (req, res) => {
-  try {
-    const { name, email, password } = req.body;
-
-    const existingUser = await User.findOne({
-      where: {
-        email: email,
-      },
-    });
-
-    if (existingUser) {
-      console.log('User already registered. Please login.');
-      return res.status(400).json({ error: 'User already registered. Please login.' });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const newUser = await User.create({
-      name: name,
-      email: email,
-      password: hashedPassword, // Remember to hash the password before storing it
-    });
-
-    res.json({ success: true, message: 'Signup successful!', user: newUser });
-  } catch (error) {
-    console.error('Error during signup:', error);
-    res.status(500).json({ error: error.message || 'Internal server error' });
-  }
-});
-
-//login
-
-app.post('/users/login', async (req, res) => {
-    try {
-      const { email, password } = req.body;
-  
-      const user = await User.findOne({
-        where: {
-          email: email,
-          // You should hash the password and compare it securely
-        },
-      });
-  
-      if (!user) {
-        console.log('Invalid email or password.');
-        return res.status(400).json({ error: 'Invalid email or password.' });
-      }
-
-      const passwordMatch = await bcrypt.compare(password, user.password);
-
-      if (!passwordMatch) {
-          console.log('Invalid email or password.');
-          return res.status(400).json({ error: 'Invalid email or password.' });
-      }
-  
-      console.log('User logged in successfully.');
-      res.json({ success: true, message: 'Login successful!', user: user });
-      
-    } catch (error) {
-      console.error('Error during login:', error);
-      res.status(500).json({ error: error.message || 'Internal server error' });
-    }
-  });
-  
-
+  app.use('/', userrouter)
   app.use('/', expenseroutes)
 
   app.get('/', (req, res) => {
@@ -107,7 +45,8 @@ app.post('/users/login', async (req, res) => {
     });
 
    
-  
+    User.hasMany(Expense);
+    Expense.belongsTo(User)
 
 db.sync()
   .then(() => {

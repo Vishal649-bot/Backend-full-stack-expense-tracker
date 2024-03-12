@@ -14,6 +14,7 @@ document.getElementById('login-form').addEventListener('submit', async function(
       // Send POST request using Axios
       const response = await axios.post('/users/login', userData);
       console.log('Login successful:', response.data);
+      localStorage.setItem('token', response.data.token)
     //   alert('login succesful')
     window.location.href = 'http://localhost:3001/expense'; // Redirect to the /expense page
       // Redirect user or perform actions after successful login

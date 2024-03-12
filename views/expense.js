@@ -1,6 +1,7 @@
 // Define a function to fetch and update the expense list
 function fetchAndUpdateExpenseList() {
-  axios.get('/expense/api')
+  const token = localStorage.getItem('token')
+  axios.get('/expense/api',{headers:{"Authorization":token}})
     .then(function(response) {
       const expenses = response.data;
       const ul = document.querySelector('ul');
@@ -60,7 +61,13 @@ document.getElementById('expense-form').addEventListener('submit', function(even
 
     console.log(expenseData);
     // Send POST request using Axios
-    axios.post('/expense/addexpense', expenseData)
+    const token = localStorage.getItem('token')
+    const config = {
+      headers: {
+        'Authorization': `Bearer ${token}` // Assuming it's a Bearer token
+      }
+    }
+    axios.post('/expense/addexpense', expenseData, config)
       .then(function(response) {
         console.log('Expense added successfully:', response.data);
         // Handle success response here if needed
