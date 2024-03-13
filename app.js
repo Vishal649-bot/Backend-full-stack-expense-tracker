@@ -8,8 +8,10 @@ const bcrypt = require("bcrypt");
 const db = require('./utils/db');
 const User = require('./modals/user');
 const Expense = require('./modals/expense');
+const Order = require("./modals/order");
 const expenseroutes = require('./Router/expenseroutes')
 const userrouter = require('./Router/userrouter')
+const purchaserouter = require('./Router/purchaseroutes')
 const app = express();
 
 app.use(cors());
@@ -35,6 +37,7 @@ app.use(express.static(path.join(__dirname, 'views')));
 
   app.use('/', userrouter)
   app.use('/', expenseroutes)
+  app.use('/', purchaserouter)
 
   app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'index.html'));
@@ -47,6 +50,9 @@ app.use(express.static(path.join(__dirname, 'views')));
    
     User.hasMany(Expense);
     Expense.belongsTo(User)
+
+    User.hasMany(Order);
+    Order.belongsTo(User)
 
 db.sync()
   .then(() => {

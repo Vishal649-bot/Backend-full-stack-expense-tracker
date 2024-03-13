@@ -6,7 +6,7 @@ const authenticate = async (req, res, next) => {
   try {
     const token = req.header("Authorization");
     if (!token) {
-        return res.status(403).json({ success: false, error: "Unauthorized" });
+        return res.status(403).json({ success: false, error: "auth.js(file) Unauthorized" });
       }
     // console.log(token);
    const decoded = jwt.verify(token, "secretKey");
@@ -26,4 +26,4 @@ const authenticate = async (req, res, next) => {
   }
 };
 
-module.exports = { authenticate };
+module.exports = authenticate ;

@@ -44,7 +44,7 @@ router.post('/expense/addexpense', async (req, res) => {
     }
 });
 
-router.get('/expense/api', userautherization.authenticate, (req, res) => {
+router.get('/expense/api', userautherization, (req, res) => {
     // Send the HTML file as a response
    const userId = req.user.id;
 
