@@ -51,7 +51,7 @@ async function showPremimum(){
     entryElement.classList.add('leaderboard-entry');
 
     const nameElement = document.createElement('span');
-    nameElement.textContent = entry.name + ': ';
+    nameElement.textContent = 'Name '+entry.name + ' :' +"  Expense  " ;
     entryElement.appendChild(nameElement);
 
     const totalSpentElement = document.createElement('span');
