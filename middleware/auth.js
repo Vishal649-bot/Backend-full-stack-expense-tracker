@@ -22,7 +22,7 @@ const authenticate = async (req, res, next) => {
     next();
   } catch (err) {
     console.log("Error:", err);
-    res.status(401).json({ success: false, error: "Unauthorized" });
+    res.status(401).json({ success: false, error: "auth.js file Unauthorized" });
   }
 };
 

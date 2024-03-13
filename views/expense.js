@@ -1,3 +1,68 @@
+function checkAndUpdateUI() {
+  const premiumStatus = localStorage.getItem('premium');
+  if (premiumStatus === 'true') {
+    // If the user is premium, update UI
+    updateUIAfterPaymentSuccess();
+  }
+}
+
+// Call the function to check and update UI when the page loads
+checkAndUpdateUI();
+
+function updateUIAfterPaymentSuccess() {
+  // Remove the premium button
+  const premiumButton = document.getElementById('premium-button');
+  if (premiumButton) {
+    premiumButton.remove();
+  }
+// Update the existing <p> tag to display a message indicating premium membership
+const message = document.getElementById('showleaderboard');
+if (message) {
+  message.textContent = "You are a premium user";
+}
+
+// Create a button for showing the leaderboard (if needed)
+const leaderboardButton = document.createElement('button');
+leaderboardButton.textContent = "Show Leaderboard";
+leaderboardButton.addEventListener('click', function() {
+  // Handle showing leaderboard here
+  showPremimum()
+  console.log("Showing leaderboard");
+});
+const entryElement = document.getElementById('showpremiumbtn');
+entryElement.innerHTML = 'Show premium feature'
+message.appendChild(leaderboardButton);
+}
+
+async function showPremimum(){
+  const token = localStorage.getItem('token')
+  const response = await axios.get('/showleaderboard',{headers:{"Authorization":token}})
+  console.log(response.data.outputArr);
+  const leaderboard = response.data.outputArr;
+
+  // Sort the leaderboard by totalSpent
+  leaderboard.sort((a, b) => b.totalSpent - a.totalSpent);
+
+  const leaderboardContainer = document.getElementById('leaderboard-container');
+  leaderboardContainer.innerHTML = ''; // Clear previous content
+
+  leaderboard.forEach(entry => {
+    const entryElement = document.createElement('div');
+    entryElement.classList.add('leaderboard-entry');
+
+    const nameElement = document.createElement('span');
+    nameElement.textContent = entry.name + ': ';
+    entryElement.appendChild(nameElement);
+
+    const totalSpentElement = document.createElement('span');
+    totalSpentElement.textContent = entry.totalSpent;
+    entryElement.appendChild(totalSpentElement);
+
+    leaderboardContainer.appendChild(entryElement);
+  });
+}
+
+
 // Define a function to fetch and update the expense list
 function fetchAndUpdateExpenseList() {
   const token = localStorage.getItem('token')
@@ -137,7 +202,7 @@ document.getElementById('expense-form').addEventListener('submit', function(even
             alert("Payment successful & you are premimum user");
             console.log(successResponse);
             localStorage.setItem('premium' ,true)
-            document.getElementById('premium-button').remove()
+            updateUIAfterPaymentSuccess();
           } else {
             alert("Payment failed");
           }
@@ -154,23 +219,6 @@ document.getElementById('expense-form').addEventListener('submit', function(even
       console.log(response.error);
       alert("Payment failed");
 
-      try {
-        const failResponse = await axios.post(
-          "http://localhost:3001/payment/failed",
-          {
-            payment_id: response.error.metadata.payment_id,
-          },
-          {
-            headers: {
-              "Authorization": token,
-            },
-          }
-        );
-
-        console.log(failResponse);
-      } catch (error) {
-        console.error(error);
-      }
     });
 
     rzp1.open();

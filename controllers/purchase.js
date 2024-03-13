@@ -5,8 +5,8 @@ require("dotenv").config();
 
 
 var rzp = new Razorpay({
-  key_id: "rzp_test_DYdcKSZFWnzqnG",
-  key_secret: "KlyBXp0zhjiCGwrt7ikfhgub",
+  key_id: "rzp_test_ooJmLRA4FklWjz",
+  key_secret: "MKz22t5DF43tYLPf3JaOhk10",
 });
 
 
