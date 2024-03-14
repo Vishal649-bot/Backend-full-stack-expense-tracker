@@ -3,7 +3,8 @@ const router = express.Router();
 const path = require('path');
 const expenseModale = require('../modals/expense')
 const jwt = require("jsonwebtoken");
-const userautherization =  require('../middleware/auth')
+const userautherization =  require('../middleware/auth');
+const sequelize = require('../utils/db');
 
 router.get('/expense', (req, res) => {
     // Send the HTML file as a response
@@ -11,6 +12,7 @@ router.get('/expense', (req, res) => {
 });
 
 router.post('/expense/addexpense', async (req, res) => {
+    let transaction;
     const token = req.header("Authorization");
     console.log(token);
     const tokenParts = token.split(" ");
@@ -18,6 +20,8 @@ router.post('/expense/addexpense', async (req, res) => {
     const userId = decoded.userId;
     console.log(userId);
     try {
+        transaction = await sequelize.transaction();
+
         const { amount, description, category } = req.body;
         console.log(req.body);
         console.log(amount);
@@ -35,10 +39,14 @@ router.post('/expense/addexpense', async (req, res) => {
             description: description,
             category: category,
             userSignupId: userId
-        });
+        },{transaction});
+        await transaction.commit()
 
         res.json({ success: true, message: 'Expense added successfully!', expense: newExpense });
     } catch (error) {
+        if (transaction) {
+            await transaction.rollback();
+        }
         console.error('Error adding expense:', error);
         res.status(500).json({ error: error.message || 'Internal server error' });
     }
