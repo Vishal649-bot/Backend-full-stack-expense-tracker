@@ -13,6 +13,7 @@ const expenseroutes = require('./Router/expenseroutes')
 const userrouter = require('./Router/userrouter')
 const purchaserouter = require('./Router/purchaseroutes')
 const premiumrouter = require('./Router/premiumrouter')
+const forgotPasswordrout = require('./Router/forgotPasswordrout')
 const app = express();
 
 app.use(cors());
@@ -40,6 +41,7 @@ app.use(express.static(path.join(__dirname, 'views')));
   app.use('/', expenseroutes)
   app.use('/', purchaserouter)
   app.use('/', premiumrouter)
+  app.use('/', forgotPasswordrout)
 
   app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'index.html'));

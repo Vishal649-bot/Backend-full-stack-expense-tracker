@@ -18,7 +18,18 @@
     </div>
     <button type="submit">Login</button>
   </form>
- 
+
+
+  <button id="forgot-password">Forgot Password?</button>
+  <form id="forgot-password-form" style="display: none">
+    <h3>Enter your registered email to reset your password</h3>
+    <div>
+      <label for="forgot-email">Email:</label>
+      <input type="email" id="forgot-email" name="email" required>
+    </div>
+    <button type="submit">Send Reset Link</button>
+  </form>
+
   <a href="/">signup</a>
   <!-- error -->
   <h3 id="error-message"></h3>
