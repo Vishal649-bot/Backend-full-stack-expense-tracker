@@ -9,6 +9,7 @@ const db = require('./utils/db');
 const User = require('./modals/user');
 const Expense = require('./modals/expense');
 const Order = require("./modals/order");
+const resetPassword = require("./modals/resetPassword");
 const expenseroutes = require('./Router/expenseroutes')
 const userrouter = require('./Router/userrouter')
 const purchaserouter = require('./Router/purchaseroutes')
@@ -30,10 +31,6 @@ app.use(bodyParser.json());
 
 app.use(express.static(path.join(__dirname, 'views')));
 
-// app.get('/expense', (req, res) => {
-//   // Send the HTML file as a response
-//   res.sendFile(path.join(__dirname, 'views', 'expense.html'));
-// });
 
 
 
@@ -57,6 +54,10 @@ app.use(express.static(path.join(__dirname, 'views')));
 
     User.hasMany(Order);
     Order.belongsTo(User)
+
+    
+User.hasMany(resetPassword)
+resetPassword.belongsTo(User)
 
 db.sync()
   .then(() => {

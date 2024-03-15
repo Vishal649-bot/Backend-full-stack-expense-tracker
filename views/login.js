@@ -41,10 +41,15 @@ document.getElementById('login-form').addEventListener('submit', async function(
   forgotPasswordForm.addEventListener('submit', (event) => {
     event.preventDefault(); // Prevent default form submission
 
+    const token = localStorage.getItem('token')
     const email = document.getElementById('forgot-email').value;
 
     // Use Axios to call the backend API route
-    axios.post('/forgot-password', { email })
+    axios.post('/forgot-password', { email }, {
+      headers: {
+        'Authorization': token// Pass the token as a Bearer token
+      }
+    })
       .then(response => {
         // Handle successful response (e.g., show success message)
         console.log(response.data); // For debugging purposes
