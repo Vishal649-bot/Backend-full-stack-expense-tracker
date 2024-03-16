@@ -29,23 +29,18 @@ window.addEventListener("load", async () => {
         table.appendChild(tr);
       });
 
-
-
-
-
       //month code
       const yearlytable = document.getElementById("Yearly-table");
       const dateString = formattedDate;
       const dateObject = new Date(dateString);
       const monthName = dateObject.toLocaleString("default", { month: "long" });
-      let totalexpense= 0
+      let totalexpense = 0;
 
       expenses.forEach(function (expense) {
-        totalexpense += parseInt(expense.expense)
-
+        totalexpense += parseInt(expense.expense);
       });
 
-      const saving = 40000-totalexpense
+      const saving = 40000 - totalexpense;
       const tr = document.createElement("tr");
       tr.innerHTML = `<td>${monthName}</td>
           <td>40000</td>
@@ -55,6 +50,73 @@ window.addEventListener("load", async () => {
 
       yearlytable.appendChild(tr);
 
+      //donloadbtn
+
+      const downloadbutton = document.getElementById("download-button");
+      const button = document.createElement("button");
+      button.textContent = "Download";
+      downloadbutton.appendChild(button);
+      // const token = localStorage.getItem("token")
+
+      button.addEventListener("click", async function () {
+        // Send a GET request using Axios
+        axios
+          .get("/download", { headers: { Authorization: token } })
+          .then(function (response) {
+            // Handle success
+            console.log("Download request successful");
+            console.log(response);
+            if (response.status === 200) {
+              var a = document.createElement("a");
+              a.href = response.data.fileUrl;
+
+              a.download = "myexpense.csv";
+              a.click()
+            }
+            
+            //post data on database file url and usersignupid
+            
+          })
+          .catch(function (error) {
+            // Handle error
+            console.error("Error occurred while downloading:", error);
+          });
+          
+        axios
+          .get("/getfileurl", { headers: { Authorization: token } })
+          .then((response) => {
+            // Handle success
+            console.log("File URLs received:", response.data);
+
+            // Assuming response.data contains an array of fileUrls
+            let ul = document.getElementById("downloadli");
+            const fileUrls = response.data.downloaddata;
+            console.log(fileUrls);
+            ul.innerHTML = ' '
+            fileUrls.forEach((fileUrlObject) => {
+              // Create a new <a> element
+              let a = document.createElement("a");
+              // Set the href attribute to the file URL
+              a.href = fileUrlObject.url;
+              // Set the download attribute to specify the filename
+              a.download = `file_${fileUrlObject.id}.txt`; // You can adjust the filename as needed
+              // Set the innerHTML of the anchor element to the filename (optional)
+              a.innerHTML = `File ${fileUrlObject.id}`;
+
+              // Create a new <li> element
+              let li = document.createElement("li");
+              // Append the <a> element to the <li> element
+              li.appendChild(a);
+              // Append the <li> element to the <ul> element
+              ul.appendChild(li);
+            });
+          })
+          .catch((error) => {
+            // Handle error
+            console.error("Error occurred while fetching file URLs:", error);
+          });
+      });
+    
     }
   } catch (error) {
     console.error(error);

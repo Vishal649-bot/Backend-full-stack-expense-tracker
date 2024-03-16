@@ -10,11 +10,13 @@ const User = require('./modals/user');
 const Expense = require('./modals/expense');
 const Order = require("./modals/order");
 const resetPassword = require("./modals/resetPassword");
+const download = require("./modals/download");
 const expenseroutes = require('./Router/expenseroutes')
 const userrouter = require('./Router/userrouter')
 const purchaserouter = require('./Router/purchaseroutes')
 const premiumrouter = require('./Router/premiumrouter')
 const forgotPasswordrout = require('./Router/forgotPasswordrout')
+const donloadReportRoute = require('./Router/donloadReportRoute')
 const app = express();
 
 app.use(cors());
@@ -39,6 +41,7 @@ app.use(express.static(path.join(__dirname, 'views')));
   app.use('/', purchaserouter)
   app.use('/', premiumrouter)
   app.use('/', forgotPasswordrout)
+  app.use('/', donloadReportRoute)
 
   app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'index.html'));
@@ -58,6 +61,9 @@ app.use(express.static(path.join(__dirname, 'views')));
     
 User.hasMany(resetPassword)
 resetPassword.belongsTo(User)
+
+User.hasMany(download);
+download.belongsTo(User)
 
 db.sync()
   .then(() => {
