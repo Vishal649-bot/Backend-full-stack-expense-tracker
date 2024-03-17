@@ -190,7 +190,7 @@ async function showPremimum() {
 }
 
 // Define a function to fetch and update the expense list
-function fetchAndUpdateExpenseList(page = 1) {
+function fetchAndUpdateExpenseList(page = 1, pageSize = 5) {
   const token = localStorage.getItem("token");
   //  const bool =  localStorage.getItem('premium')
   //  console.log(bool);
@@ -198,58 +198,63 @@ function fetchAndUpdateExpenseList(page = 1) {
   //   document.getElementById('premium-button').remove()
   //  }
 
-    axios
-        .get(`/expense/api?page=${page}`, { headers: { Authorization: token } })
-        .then(function (response) {
-            const data = response.data;
-            const expenses = data.expenses;
-            const totalPages = data.totalPages;
-            const currentPage = data.currentPage;
+  axios
+  .get(`/expense/api?page=${page}&pageSize=${pageSize}`, { headers: { Authorization: token } })
+  .then(function (response) {
+      const data = response.data;
+      const expenses = data.expenses;
+      const totalPages = data.totalPages;
+      const currentPage = data.currentPage;
 
-            const ul = document.querySelector("ul");
-            ul.innerHTML = "";
+      const ul = document.querySelector("ul");
+      ul.innerHTML = "";
 
-            expenses.forEach(function (expense) {
-                const li = document.createElement("li");
-                li.textContent = `Amount: ${expense.expense}, Description: ${expense.description}, Category: ${expense.category}`;
-                
-                const deleteButton = document.createElement("button");
-                deleteButton.textContent = "Delete";
-                deleteButton.addEventListener("click", function () {
-                    axios
-                        .delete(`/expense/api/${expense.id}`)
-                        .then(function (response) {
-                            console.log("Expense deleted successfully:", response.data);
-                            fetchAndUpdateExpenseList(currentPage); // Reload current page after deletion
-                        })
-                        .catch(function (error) {
-                            console.error("Error deleting expense:", error);
-                        });
-                });
+      expenses.forEach(function (expense) {
+          const li = document.createElement("li");
+          li.textContent = `Amount: ${expense.expense}, Description: ${expense.description}, Category: ${expense.category}`;
+          
+          const deleteButton = document.createElement("button");
+          deleteButton.textContent = "Delete";
+          deleteButton.addEventListener("click", function () {
+              axios
+                  .delete(`/expense/api/${expense.id}`)
+                  .then(function (response) {
+                      console.log("Expense deleted successfully:", response.data);
+                      fetchAndUpdateExpenseList(currentPage, pageSize); // Reload current page after deletion
+                  })
+                  .catch(function (error) {
+                      console.error("Error deleting expense:", error);
+                  });
+          });
 
-                li.appendChild(deleteButton);
-                ul.appendChild(li);
-            });
+          li.appendChild(deleteButton);
+          ul.appendChild(li);
+      });
 
-            // Pagination
-            const paginationContainer = document.querySelector("#pagination");
-            paginationContainer.innerHTML = "";
-            for (let i = 1; i <= totalPages; i++) {
-                const button = document.createElement("button");
-                button.textContent = i;
-                button.addEventListener("click", function () {
-                    fetchAndUpdateExpenseList(i);
-                });
-                paginationContainer.appendChild(button);
-            }
-        })
-        .catch(function (error) {
-            console.error("Error fetching expense data:", error);
-        });
+      // Pagination
+      const paginationContainer = document.querySelector("#pagination");
+      paginationContainer.innerHTML = "";
+      for (let i = 1; i <= totalPages; i++) {
+          const button = document.createElement("button");
+          button.textContent = i;
+          button.addEventListener("click", function () {
+              fetchAndUpdateExpenseList(i, pageSize);
+          });
+          paginationContainer.appendChild(button);
+      }
+  })
+  .catch(function (error) {
+      console.error("Error fetching expense data:", error);
+  });
 }
 
 // Call the function initially to fetch and update the expense list
 fetchAndUpdateExpenseList();
+// Event listener for changing page size
+document.getElementById("pageSizeSelect").addEventListener("change", function () {
+  const selectedPageSize = parseInt(this.value);
+  fetchAndUpdateExpenseList(1, selectedPageSize); // Fetch first page with selected page size
+});
 
 document
   .getElementById("expense-form")

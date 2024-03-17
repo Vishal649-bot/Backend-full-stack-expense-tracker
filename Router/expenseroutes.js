@@ -54,27 +54,33 @@ router.post('/expense/addexpense', async (req, res) => {
 
 
 
-const PAGE_SIZE = 10; // Number of expenses per page
+// const PAGE_SIZE = 10; // Number of expenses per page
 
 router.get('/expense/api', userautherization, (req, res) => {
     const userId = req.user.id;
+    let pageSize = parseInt(req.query.pageSize) || 5; // Get the requested page size, default to 5 if not provided
     const page = parseInt(req.query.page) || 1; // Get the requested page, default to 1 if not provided
 
+    // Validate page size to avoid excessive load
+    if (pageSize !== 5 && pageSize !== 10 && pageSize !== 25 && pageSize !== 50) {
+        pageSize = 5; // Default to 5 if an invalid page size is provided
+    }
+
     // Calculate offset to skip expenses for previous pages
-    const offset = (page - 1) * PAGE_SIZE;
+    const offset = (page - 1) * pageSize;
 
     // Find expenses associated with the user ID with pagination
     expenseModale.findAndCountAll({
         where: {
             userSignupId: userId
         },
-        limit: PAGE_SIZE,
+        limit: pageSize,
         offset: offset
     })
     .then(result => {
         const expenses = result.rows;
         const totalCount = result.count;
-        const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+        const totalPages = Math.ceil(totalCount / pageSize);
 
         res.json({
             expenses: expenses,
