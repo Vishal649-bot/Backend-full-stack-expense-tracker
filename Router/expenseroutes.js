@@ -52,25 +52,42 @@ router.post('/expense/addexpense', async (req, res) => {
     }
 });
 
-router.get('/expense/api', userautherization, (req, res) => {
-    // Send the HTML file as a response
-   const userId = req.user.id;
 
-    // Find expenses associated with the user ID
-    expenseModale.findAll({
+
+const PAGE_SIZE = 10; // Number of expenses per page
+
+router.get('/expense/api', userautherization, (req, res) => {
+    const userId = req.user.id;
+    const page = parseInt(req.query.page) || 1; // Get the requested page, default to 1 if not provided
+
+    // Calculate offset to skip expenses for previous pages
+    const offset = (page - 1) * PAGE_SIZE;
+
+    // Find expenses associated with the user ID with pagination
+    expenseModale.findAndCountAll({
         where: {
             userSignupId: userId
-        }
+        },
+        limit: PAGE_SIZE,
+        offset: offset
     })
-    .then(expenses => {
-        console.log(expenses);
-        res.json(expenses);
+    .then(result => {
+        const expenses = result.rows;
+        const totalCount = result.count;
+        const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+
+        res.json({
+            expenses: expenses,
+            totalPages: totalPages,
+            currentPage: page
+        });
     })
     .catch(err => {
         console.log(err);
         res.status(500).json({ error: 'Internal server error' });
     });
 });
+
 
 router.delete('/expense/api/:id', async(req, res) => {
     const expenseId = req.params.id;
