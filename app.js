@@ -4,6 +4,9 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const session = require("express-session");
 const bcrypt = require("bcrypt");
+const helmet = require("helmet");
+const morgan = require('morgan')
+const fs = require('fs')
 
 const db = require('./utils/db');
 const User = require('./modals/user');
@@ -17,7 +20,9 @@ const purchaserouter = require('./Router/purchaseroutes')
 const premiumrouter = require('./Router/premiumrouter')
 const forgotPasswordrout = require('./Router/forgotPasswordrout')
 const donloadReportRoute = require('./Router/donloadReportRoute')
+require("dotenv").config();
 const app = express();
+
 
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -33,8 +38,11 @@ app.use(bodyParser.json());
 
 app.use(express.static(path.join(__dirname, 'views')));
 
+const accesslogstream = fs.createWriteStream(path.join(__dirname,'access.log'),
+{ flags:'a'}
+)
 
-
+app.use(morgan('combined', {stream: accesslogstream}))
 
   app.use('/', userrouter)
   app.use('/', expenseroutes)
@@ -50,8 +58,9 @@ app.use(express.static(path.join(__dirname, 'views')));
   app.get('/login', (req, res) => {
       res.sendFile(path.join(__dirname, 'views', 'login.html'));
     });
+    app.use(helmet());
+  //  app.use(compression())
 
-   
     User.hasMany(Expense);
     Expense.belongsTo(User)
 
@@ -68,7 +77,7 @@ download.belongsTo(User)
 db.sync()
   .then(() => {
     console.log('Sequelize sync successful');
-    app.listen(3001, () => {
+    app.listen((process.env.PORT||3001), () => {
       console.log('Server is running on port 3001');
     });
   })

@@ -7,7 +7,7 @@ window.addEventListener("load", async () => {
       const response = await axios.get("/expense/api", {
         headers: { Authorization: token },
       });
-      const expenses = response.data;
+      const expenses = response.data.expenses;
       console.log(expenses);
 
       const table = document.getElementById("premium-table");
@@ -249,10 +249,12 @@ function fetchAndUpdateExpenseList(page = 1, pageSize = 5) {
 }
 
 // Call the function initially to fetch and update the expense list
-fetchAndUpdateExpenseList();
+const pagenum = localStorage.getItem('pagenumber')
+fetchAndUpdateExpenseList(1,pagenum);
 // Event listener for changing page size
 document.getElementById("pageSizeSelect").addEventListener("change", function () {
   const selectedPageSize = parseInt(this.value);
+  localStorage.setItem('pagenumber', selectedPageSize)
   fetchAndUpdateExpenseList(1, selectedPageSize); // Fetch first page with selected page size
 });
 

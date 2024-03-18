@@ -5,8 +5,8 @@ require("dotenv").config();
 
 
 var rzp = new Razorpay({
-  key_id: "rzp_test_ooJmLRA4FklWjz",
-  key_secret: "MKz22t5DF43tYLPf3JaOhk10",
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
 
@@ -17,7 +17,7 @@ exports.purchaseMembership = async (req, res) => {
       currency: "INR",
       receipt: "order_rcptid_11",
     };
-
+console.log(process.env.RAZORPAY_KEY_ID, process.env.RAZORPAY_KEY_SECRET);
     const order = await rzp.orders.create(options);
     console.log('dejhvfjehyw',order);
     await req.user.createOrder({ order_id: order.id, status: "PENDING" });
