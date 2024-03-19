@@ -7,12 +7,13 @@ const jwt = require("jsonwebtoken");
 const auth = require("../middleware/auth");
 const AWS = require("aws-sdk");
 const download = require('../modals/download');
+require("dotenv").config();
 
 //uploading to s3 function
 function uploadToS3(data, fileName) {
-    const  BUCKET_NAME = 'expensetrackingapp6398';
-    const IAM_USER_KEY = "AKIAVRUVWGINX2UJN2VS";
-    const  IAM_USER_SECRET = "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";
+    const  BUCKET_NAME = process.env.BUCKET_NAME;
+    const IAM_USER_KEY = process.env.IAM_USER_KEY;
+    const  IAM_USER_SECRET = process.env.IAM_USER_SECRET;
   
     const s3Bucket = new AWS.S3({
       accessKeyId: IAM_USER_KEY,

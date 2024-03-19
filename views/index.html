@@ -4,8 +4,74 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>User Signup</title>
-  <!-- Include Axios library -->
-  
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    form {
+      max-width: 400px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      box-sizing: border-box;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      padding: 10px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    button[type="submit"]:hover {
+      background-color: #0056b3;
+    }
+
+    a {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    #error-message {
+      text-align: center;
+      color: red;
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
   <h2>User Signup</h2>
@@ -20,7 +86,7 @@
     </div>
     <div>
       <label for="password">Password:</label>
-      <input type="text" id="password" name="password" required>
+      <input type="password" id="password" name="password" required>
     </div>
     <button type="submit">Submit</button>
   </form>
@@ -28,7 +94,6 @@
   <a href="/login">login</a>
   <!-- error -->
   <h3 id="error-message"></h3>
-  
 
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="signup.js"></script>
